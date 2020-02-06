@@ -43,7 +43,7 @@ install:
 
 
 before_script:
-  - git clone https://github.com/analogdevicesinc/libsmu.git
+  - git clone https://github.com/analogdevicesinc/libsmu.git -b fix-deadlock-mulidev
   - cd libsmu
   - mkdir build && cd build && cmake -DBUILD_PYTHON=OFF -DCMAKE_INSTALL_PREFIX=/usr/local/ ..
   - make
