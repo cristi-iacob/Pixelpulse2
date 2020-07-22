@@ -320,8 +320,7 @@ void SessionItem::getSamples()
             }
 
             if (m_logging) {
-                std::thread t1([=] {this->m_data_logger->addBulkData(dev, rxbuf);});
-                t1.detach();
+				m_data_logger->addBulkData(dev, rxbuf);
             }
             i++;
         }
@@ -657,7 +656,7 @@ void BufferChanger::changeBuffer(){
     this->thread()->quit();
 }
 
-DataLogger::DataLogger(float sampleTime)
+DataLogger::DataLogger(float sampleTime, QObject* parent) : QObject(parent)
 {
     //if created by a valid session (1s or 10s sample time), create the log file
     if (sampleTime != -1
@@ -732,7 +731,6 @@ void DataLogger::resetData(DeviceItem* deviceItem)
 
 void DataLogger::addData(DeviceItem * deviceItem, std::array<float, 4> samples)
 {
-    m_logMutex.lock();
     if (dataCounter[deviceItem] == 0) {
         resetData(deviceItem);
     }
@@ -751,13 +749,13 @@ void DataLogger::addData(DeviceItem * deviceItem, std::array<float, 4> samples)
             resetData(pair.first);
         }
     }
-    m_logMutex.unlock();
 }
 
 void DataLogger::addBulkData(DeviceItem* deviceItem, std::vector<std::array<float, 4> > buff)
 {
-    for (auto sample : buff)
-        addData(deviceItem, sample);
+	QtConcurrent::run(&m_threadPool, [this, deviceItem, buff] {
+		doAddBulkData(deviceItem, buff);
+	});
 }
 
 void DataLogger::printData(DeviceItem* deviceItem)
@@ -785,4 +783,11 @@ void DataLogger::createLoggingFolder()
     if (!QDir("logging").exists()) {
         QDir().mkdir("logging");
     }
+}
+
+void DataLogger::doAddBulkData(DeviceItem* deviceItem, std::vector<std::array<float, 4>> buff)
+{
+	for (auto sample : buff) {
+		addData(deviceItem, sample);
+	}
 }

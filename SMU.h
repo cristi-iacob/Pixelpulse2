@@ -9,6 +9,8 @@
 #include <QTime>
 #include <cmath>
 #include <fstream>
+#include <QThreadPool>
+#include <QtConcurrent/QtConcurrent>
 
 class SessionItem;
 class DeviceItem;
@@ -322,9 +324,10 @@ protected slots:
 
 void registerTypes();
 
-class DataLogger {
+class DataLogger: public QObject {
+	Q_OBJECT
 public:
-    DataLogger(float sampleTime);
+	DataLogger(float sampleTime, QObject* parent = nullptr);
     void addData(DeviceItem*, std::array < float, 4 >);
     void addBulkData(DeviceItem*, std::vector < std::array < float, 4 > >);
     double computeAverage(DeviceItem*, int channel);
@@ -349,6 +352,8 @@ private:
     std::chrono::time_point <std::chrono::system_clock> startTime;
     std::chrono::time_point <std::chrono::system_clock> lastLog;
     void createLoggingFolder();
-    std::mutex m_logMutex;
+	int m_threadsNumber = 5;
+	QThreadPool m_threadPool;
+	void doAddBulkData(DeviceItem*, std::vector < std::array < float, 4 > >);
 };
 
