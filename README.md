@@ -25,99 +25,28 @@ Click and drag the X axis to pan in time.
 * OSX - Navigate to the [releases](https://github.com/analogdevicesinc/pixelpulse2/releases) and collect the latest `pixelpulse2-bundled.dmg.zip` package. The latest testing build is available from [Travis-CI](http://pixelpulse2nightly.s3-website-us-east-1.amazonaws.com/pixelpulse2.dmg).
 * Windows - For a testing build, download the dependency package and the latest binary build from [appveyor](https://ci.appveyor.com/project/analogdevicesinc/pixelpulse2/build/artifacts). For an official release build, navigate to releases and collect the latest pixelpulse2-setup.exe.
 * Linux - Build from source (below) 
-#### Advanced
 
-To build from source on any platform, you need to install a C++ compiler toolchain, collect the build dependencies, setup your build environment, and compile the project.
+#### Installation for Linux
 
-If you have not built packages from source before, this is ill-advised.
-* Build and install libsmu (https://github.com/analogdevicesinc/libsmu)
-* Install Qt5.4.
- * On most Linux Distributions, Qt5 is available in repositories. The complete list of packages required varies, but includes qt's support for declarative (qml) UI programming, qtquick, qtquick-window, qtquick-controls, and qtquick-layouts.
- * Binary installers are available from [the Qt project](http://qtmirror.ics.com/pub/qtproject/development_releases/qt/5.4/5.4.0-rc/) for most platforms.
+1. Dependencies installation.
 
-To build / run on a generic POSIX platform
+The following command should install all the needed dependencies. Note that the packages' names may vary on different platforms. However, the following packages are tested and functional on Ubuntu 16, 18 and 20.
 
-    git clone https://github.com/signalspec/pixelpulse2
-    cd pixelpulse2
-    mkdir build
-    cd build
-    qmake pixelpulse2.pro -qt=qt5
-    make
+```shell
+analog@analog:~$ sudo apt-get update
+analog@analog:~$ sudo apt-get install -y git cmake g++ qt5-default qttools5-dev qtdeclarative5-dev libqt5svg5-dev libqt5opengl5-dev libqt5qml5 libqt5quick5 libqt5network5 qml-module-qtgraphicaleffects qml-module-qt-quick-layouts qml-module-qtquick-controls qml-module-qtquick-dialogs qml-module-qt-labs-settings qml-module-qt-labs-folderlistmodel qml-module-qtqml-models2
+```
 
-On Windows the qmake command should look like this
+2. Install libsmu. More information [here](https://github.com/analogdevicesinc/libsmu). You can directly install the corresponding .deb packages.
 
-    qmake pixelpulse2.pro "LIBSMU_LIBRARY = path_to_libsmu_dll" "LIBSMU_INCLUDE_PATH = path_to_libsmu_include_folder" -qt=qt5
+3. Build and install Pixelpulse2.
 
-After it is finished building, you have to copy the libsmu shared library into the build folder and Pixelpulse2 should be ready to use with your M1K
-
-To build / install for Debian, from the `pixelpulse2` directory:
-
-    dh_make -p pixelpulse2_0.8 -s -c blank --createorig
-    dpkg-buildpackage
-    sudo dpkg -i ../pixelpulse2_0.1-1_i386.deb
-
-To build / run on Ubuntu 15.04, via [shabaz on Farnell](http://www.element14.com/community/groups/test-and-measurement/blog/2015/02/14/getting-started-with-the-active-learning-module-adalm1000).  
-
- * Please note that you make encounter issues if you are running a version of Ubuntu lower than 15.04, because the version of QT in the repositories will likely be less than 5.4 (this also applies if you are running a Linux distribution that uses an older version of Ubuntu, for example Linux Mint 17.1, which uses Ubuntu 14.04.)
-
-* Get ready
-
-    ```bash
-    sudo apt-get update
-    ```
-
-* Build and install libsmu (https://github.com/analogdevicesinc/libsmu)
-
-* Download and install Qt5.4
-
-    ```bash
-    wget http://qtmirror.ics.com/pub/qtproject/development_releases/qt/5.4/5.4.0-rc/qt-opensource-linux-x64-5.4.0-rc.run
-    chmod 755 qt-o*
-    ./qt-opensource-linux-x64-5.4.0-rc.run
-    ```
-    
-* Install a couple extra Qt modules
-    ```bash
-    sudo apt-get install qtdeclarative5-controls-plugin
-    sudo apt-get install qtdeclarative5-quicklayouts-plugin
-    sudo apt-get install qtdeclarative5-dev
-    ```
-
-* Change your default configuration file
-
-    ```bash
-    sudo su
-    cd /usr/lib/x86_64-linux-gnu/qt-default/qtchooser
-    ls -l
-    rm default.conf
-    ln -s ../../../../share/qtchooser/qt5-x86_64-linux-gnu.conf default.conf
-    ls –l
-    exit
-    ```
-
-* Make a new folder, clone the pixelpulse library into it from git, and build it!
-
-    ```bash
-    mkdir development
-    cd development
-    git clone https://github.com/signalspec/pixelpulse2
-    cd pixelpulse2
-    mkdir build
-    cd build
-    qmake ../pixelpulse2.pro
-    make
-    ```
-
- * Make sure your M1K is plugged into your computer.  The onboard LED should light up when it is connected.  You can double-check by typing ```lsusb```.  You should see something along the lines of ```ID 064b:784c Analog Devices, Inc. (White Mountain DSP)```
- * You should be ready to launch Pixelpulse2. First, go to the directory it was built in:
-    
-    ```bash
-    cd ~/development/pixelpulse2/build
-    ```
-
- * Run Pixelpulse2 as root
-
-    ```bash
-    sudo ./pixelpulse2
-    ```
-
+```shell
+analog@analog:~$ git clone https://github.com/analogdevicesinc/Pixelpulse2
+analog@analog:~$ cd pixelpulse2
+analog@analog:~$ mkdir build
+analog@analog:~$ cd build
+analog@analog:~$ cmake ..
+analog@analog:~$ make
+analog@analog:~$ sudo make install
+```
